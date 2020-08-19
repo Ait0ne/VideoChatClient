@@ -3,10 +3,35 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import {BrowserRouter} from 'react-router-dom';
+import {Provider} from 'react-redux';
+import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles'
+
+
+import {store} from './redux/store'
+
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#5b9b37'
+    },
+    secondary: {
+      main: '#ffffff'
+    }
+  }
+})
+
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <App />
+        </ThemeProvider>
+      </Provider>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );
