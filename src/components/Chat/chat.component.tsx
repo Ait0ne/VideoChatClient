@@ -1,16 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import background from '../../assets/chat-background.jpg'
 import moment from 'moment';
-import {connect, ConnectedProps} from 'react-redux';
 
-import {StateProps} from '../../redux/root-reducer';
 import {socket} from '../../App';
 import {ChatContainer, CustomTextField, ChatInputContainer, ChatBodyContainer, CustomArrowUp, ChatMessageContainer} from './chat.styles';
-
+import {IUser} from '../../redux/user/user.types';
 
 
 interface ChatProps {
-    channelId:string
+    channelId:string,
+    currentUser: IUser
 }
 
 
@@ -23,7 +22,7 @@ export interface IMessage {
 
 
 
-const Chat:React.FC<ChatProps&ReduxProps> = ({channelId, currentUser}) => {
+const Chat:React.FC<ChatProps> = ({channelId, currentUser}) => {
 
     const [messageText, setMessageText] = useState('')
     const [messages, setMessages] = useState<IMessage[]>([])
@@ -114,14 +113,4 @@ const Chat:React.FC<ChatProps&ReduxProps> = ({channelId, currentUser}) => {
     )
 }
 
-const mapStateToProps = (state:StateProps) => ({
-    currentUser: state.user.currentUser
-})
-
-const connector = connect(mapStateToProps)
-
-type ReduxProps = ConnectedProps<typeof connector>
-
-
-
-export default connector(Chat);
+export default Chat;
