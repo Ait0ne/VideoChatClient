@@ -32,6 +32,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                 socket.emit("makeAnswer", answer, channelID)
             }
             onIncomingCall()
+            console.log('offer',incomingCall.incomingOffer)
         } else {
             const callUser = async (channelId:string) => {
                 const offer = await peerConnection.createOffer()
@@ -41,7 +42,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
             callUser(channelID)
 
             socket.on('answerMade', async (answer:RTCSessionDescriptionInit, channelID:string)=> {
-                console.log('answer')
+                console.log('answer', answer)
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
             })
         }
@@ -50,9 +51,15 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
             socket.removeListener('answerMade')
         }
     }, [incomingCall, channelID])
-
-
-
+    
+    
+    peerConnection.ontrack = (event:RTCTrackEvent) => {
+        console.log('hefsddf', event)
+        if (remoteVideo.current) {
+            remoteVideo.current.srcObject = event.streams[0]
+        }
+    }
+    
     useEffect(() => {
         // navigator.mediaDevices.getUserMedia({ video: true, audio: true}, stream => {
         //     if (localVideo.current) {
@@ -73,12 +80,6 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
             })
         })
         .catch(err => console.log(err))
-        peerConnection.ontrack = ({streams: [stream]}) => {
-            console.log(stream)
-            if (remoteVideo.current) {
-                remoteVideo.current.srcObject = stream
-            }
-        }
     }, [])
 
     return (
