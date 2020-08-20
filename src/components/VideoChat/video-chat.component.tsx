@@ -21,7 +21,7 @@ const peerConnection = new RTCPeerConnection({iceServers: [{urls:'stun:stun.l.go
 const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID, incomingCall, connectedUserName}) => {
     const localVideo = useRef<HTMLVideoElement>(null)
     const remoteVideo = useRef<HTMLVideoElement>(null)
-    const [callActive, setCallActive] = useState(true)
+    const [callActive, setCallActive] = useState(false)
         
 
 
