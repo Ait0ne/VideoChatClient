@@ -1,6 +1,6 @@
 export const AuthMainVariants = {
     visible: {
-        clipPath:'circle(140vh at 50% 0%)',
+        clipPath: 'circle(70vh at 50% 50%)',
         filter: 'brightness(100%)',
         transition: {
             duration: 1.1,

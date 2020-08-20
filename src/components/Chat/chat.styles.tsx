@@ -6,7 +6,7 @@ import {FlexContainer} from '../../styles/styles';
 
 export const ChatContainer = styled.div`
 width:100%;
-height: calc(100vh - 56px);
+height: calc(100% - 59px);
 background-size: cover;
 background-position: center;
 `
@@ -14,8 +14,8 @@ background-position: center;
 export const ChatInputContainer = styled(FlexContainer)`
 flex-direction: row;
 height: 60px;
-position: fixed;
-bottom:0;
+/* position: fixed;
+bottom:0; */
 width: 100%;
 `
 export const ChatBodyContainer = styled(FlexContainer)`
@@ -28,7 +28,7 @@ padding:5px;
 
 export const CustomArrowUp = styled(ArrowUpward)`
 position: absolute;
-top: 5px;
+bottom: 30px;
 right: 10px;
 font-weight: bold;
 `
