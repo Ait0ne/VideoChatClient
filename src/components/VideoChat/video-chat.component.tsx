@@ -110,6 +110,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                     peerConnection.onicecandidate = handleIceCandidate
                 })
                 socket.on('receivedNewIceCandidate', (candidate:RTCIceCandidate) => {
+                    console.log('newicecandidate')
                     peerConnection.addIceCandidate(candidate)
                 })
 
