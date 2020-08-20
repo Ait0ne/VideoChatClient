@@ -14,7 +14,7 @@ interface VideoChatProps {
     }
 } 
 const {RTCPeerConnection, RTCSessionDescription} = window
-const peerConnection = new RTCPeerConnection()
+const peerConnection = new RTCPeerConnection({iceServers: [{urls:'stun:stun.l.google.com:19302'}]})
 
 const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID, incomingCall}) => {
     const localVideo = useRef<HTMLVideoElement>(null)
@@ -53,22 +53,14 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     }, [incomingCall, channelID])
     
     
-    peerConnection.ontrack = (event:RTCTrackEvent) => {
-        console.log('hefsddf', event)
-        if (remoteVideo.current) {
-            remoteVideo.current.srcObject = event.streams[0]
-        }
-    }
-    
     useEffect(() => {
-        // navigator.mediaDevices.getUserMedia({ video: true, audio: true}, stream => {
-        //     if (localVideo.current) {
-        //         localVideo.current.srcObject = stream;
-        //     }
-        //     stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
-        // },  error => {
-        //     console.log(error)
-        // })
+        peerConnection.ontrack = (event:RTCTrackEvent) => {
+            console.log('hefsddf', event)
+            if (remoteVideo.current) {
+                remoteVideo.current.srcObject = event.streams[0]
+            }
+        }
+        
         navigator.mediaDevices.getUserMedia({video:true, audio:true})
         .then(stream => {
             console.log('stream', stream)
@@ -76,6 +68,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                 localVideo.current.srcObject = stream;
             }
             stream.getTracks().forEach(track => {
+                console.log('track',track)
                 peerConnection.addTrack(track, stream)
             })
         })
