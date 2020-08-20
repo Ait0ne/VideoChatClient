@@ -19,7 +19,7 @@ bottom:0;
 width: 100%;
 `
 export const ChatBodyContainer = styled(FlexContainer)`
-height: calc(100vh - 119px);
+height: calc(100% - 60px);
 overflow-y:scroll;
 justify-content:flex-start;
 flex-direction: column-reverse;
