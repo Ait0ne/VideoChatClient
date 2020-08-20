@@ -17,7 +17,10 @@ const ChatPage: React.FC<ReduxProps> = ({currentUser}) => {
 
     useEffect(() => {
         socket.on('incomingCall', (offer: RTCSessionDescriptionInit, ID:string)=>
-            setIncomingCall({incomingOffer: offer, incomingChannelID: ID})
+            {
+                console.log('incoming')
+                setIncomingCall({incomingOffer: offer, incomingChannelID: ID})
+            }
         )
         return () => {
             socket.removeListener('incomingCall')
