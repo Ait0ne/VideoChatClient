@@ -14,10 +14,12 @@ background-position: center;
 export const ChatInputContainer = styled(FlexContainer)`
 flex-direction: row;
 height: 60px;
-position: relative;
+position: fixed;
+bottom:0;
+width: 100%;
 `
 export const ChatBodyContainer = styled(FlexContainer)`
-height: calc(100vh - 116px);
+height: calc(100vh - 119px);
 overflow-y:scroll;
 justify-content:flex-start;
 flex-direction: column-reverse;
