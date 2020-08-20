@@ -27,14 +27,12 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
 
 
     useEffect(() => {
-        const handleIceCandidate = (event: RTCPeerConnectionIceEvent) => {
-            if (event.candidate) {
-                socket.emit('newIceCandidate', event.candidate, channelID)
-            }
-        }
-
-
         if (!incomingCall) {
+            const handleIceCandidate = (event: RTCPeerConnectionIceEvent) => {
+                if (event.candidate) {
+                    socket.emit('newIceCandidate', event.candidate, channelID)
+                }
+            }
             peerConnection.ontrack = (event:RTCTrackEvent) => {
                 console.log('hefsddf', event)
                 if (remoteVideo.current) {
@@ -144,7 +142,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
             <VideoChatActionButtons>
                 <button onClick={handleCallEnd}><CallEnd/></button>
                 {
-                    !callActive&&!incomingCall?
+                    !callActive&&incomingCall?
                     <button onClick={handleCallStart}><Call/></button>
                     :null
                 }
