@@ -6,7 +6,7 @@ import {Call, CallEnd} from '@material-ui/icons';
 import Peer from 'peerjs'
 
 interface VideoChatProps {
-    toggleVideoChat: () => void,
+    toggleVideoChat: React.Dispatch<React.SetStateAction<boolean>>,
     userId: string,
     channelID: string,
     incomingCall?: {
@@ -195,15 +195,17 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
         }
     }, [channelID])
     
-
+    console.log(callActive)
 
     useEffect(()=> {
         
         
         if (!incomingCall) {
+            console.log(incomingCall)
+            console.log(1)
             socket.on('initiatedHangUp', () => {
                 hangUp()
-                toggleVideoChat()
+                toggleVideoChat(false)
             })
             peer = new Peer(userId)
             socket.emit("callUser", userId, channelID)
@@ -256,13 +258,13 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
         })
         socket.on('initiatedHangUp', () => {
             hangUp()
-            toggleVideoChat()
+            toggleVideoChat(false)
         })
     }
 
     const handleCallEnd = () => {
         hangUp()
-        toggleVideoChat()
+        toggleVideoChat(false)
     }
 
     return (
