@@ -198,13 +198,13 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
 
 
     useEffect(()=> {
-        socket.on('initiatedHangUp', () => {
-            hangUp()
-            toggleVideoChat()
-        })
-
-
+        
+        
         if (!incomingCall) {
+            socket.on('initiatedHangUp', () => {
+                hangUp()
+                toggleVideoChat()
+            })
             peer = new Peer(userId)
             socket.emit("callUser", userId, channelID)
             socket.on('answerMade', (connectedUserId:string, channelID:string)=> {
@@ -253,6 +253,10 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                     setCallActive(true)
                 })
             })
+        })
+        socket.on('initiatedHangUp', () => {
+            hangUp()
+            toggleVideoChat()
         })
     }
 
