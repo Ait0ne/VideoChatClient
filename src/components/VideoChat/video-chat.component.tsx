@@ -31,7 +31,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     // const {RTCPeerConnection, RTCSessionDescription} = window
     // const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [
     //     {
-    //     urls: 'turn:relay.backups.cz',
+    //     urls: 'turn:numb.viagenie.ca',
     //     credential: 'webrtc',
     //     username: 'webrtc'
     // },]}))
@@ -220,6 +220,9 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                         setCallActive(true)
                     })
                 })
+                peer?.on("error", (err) => {
+                    hangUp(mediaStream)
+                })
             })
 
 
@@ -250,6 +253,9 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                     setCallActive(true)
                 })
             })
+        })
+        peer?.on("error", (err) => {
+            hangUp(mediaStream)
         })
 
     }
