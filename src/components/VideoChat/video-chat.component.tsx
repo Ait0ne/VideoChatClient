@@ -17,7 +17,7 @@ interface VideoChatProps {
 } 
 
 const {RTCPeerConnection, RTCSessionDescription} = window
-const peerConnection = new RTCPeerConnection({iceServers: [{urls:'stun:stun.l.google.com:19302'},  {
+let peerConnection:RTCPeerConnection|null = new RTCPeerConnection({iceServers: [{urls:'stun:stun.l.google.com:19302'},  {
     urls: 'turn:relay.backups.cz',
     credential: 'webrtc',
     username: 'webrtc'
@@ -31,7 +31,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     const [callActive, setCallActive] = useState(false)
 
     const hangUp = useCallback(() => {
-        peerConnection.close()
+        peerConnection?.close()
         navigator.mediaDevices.getUserMedia({video: true, audio:true})
         .then(stream => {
             socket.emit('hangup', channelID)
@@ -39,11 +39,13 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                 track.stop();
             })
         })
+        peerConnection = null
     }, [channelID])
 
 
     useEffect(() => {
-        if (!incomingCall) {
+        if (!incomingCall&&peerConnection) {
+            
             const handleIceCandidate = (event: RTCPeerConnectionIceEvent) => {
                 if (event.candidate) {
                     socket.emit('newIceCandidate', event.candidate, channelID)
@@ -57,28 +59,34 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
             
             navigator.mediaDevices.getUserMedia({video:true, audio:true})
             .then(stream => {
+                console.log('call')
                 if (localVideo.current) {
                     localVideo.current.srcObject = stream;
                 }
                 stream.getTracks().forEach(track => {
                     console.log('track',track)
-                    peerConnection.addTrack(track, stream)
+                    peerConnection?.addTrack(track, stream)
                 })
                 const callUser = async () => {
-                    const offer = await peerConnection.createOffer({offerToReceiveAudio: true, offerToReceiveVideo: true})
-                    await peerConnection.setLocalDescription(new RTCSessionDescription(offer))
-                    socket.emit("callUser", offer, channelID)
+                    if (peerConnection) {
+                        const offer = await peerConnection.createOffer({offerToReceiveAudio: true, offerToReceiveVideo: true})
+                        await peerConnection.setLocalDescription(new RTCSessionDescription(offer))
+                        socket.emit("callUser", offer, channelID)
+
+                    }
                 }
                 callUser()
     
                 socket.on('answerMade', async (answer:RTCSessionDescriptionInit, channelID:string)=> {
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
-                    peerConnection.onicecandidate = handleIceCandidate
-                    setCallActive(true)
+                    if (peerConnection) {
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
+                        peerConnection.onicecandidate = handleIceCandidate
+                        setCallActive(true)
+                    }
                 })
                 socket.on('receivedNewIceCandidate', (candidate:RTCIceCandidate) => {
                     console.log('newicecandidate')
-                    peerConnection.addIceCandidate(candidate)
+                    peerConnection?.addIceCandidate(candidate)
                 })
             })
 
@@ -86,13 +94,14 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
         }
 
         socket.on('initiatedHangUp', () => {
-            peerConnection.close()
+            peerConnection?.close()
             navigator.mediaDevices.getUserMedia({video: true, audio:true})
             .then(stream => {
                 stream.getTracks().forEach(track => {
                     track.stop();
                 })
             })
+            peerConnection = null
             toggleVideoChat()
         })
 
@@ -105,7 +114,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     }, [incomingCall, channelID, userId, hangUp, toggleVideoChat])
 
     const handleCallStart = async() => {
-        if (incomingCall) {
+        if (incomingCall&&peerConnection) {
             const handleIceCandidate = (event: RTCPeerConnectionIceEvent) => {
                 if (event.candidate) {
                     socket.emit('newIceCandidate', event.candidate, channelID)
@@ -122,7 +131,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                 localVideo.current.srcObject = stream;
             }
             stream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, stream)
+                peerConnection?.addTrack(track, stream)
             })
             await peerConnection.setRemoteDescription(
                 new RTCSessionDescription(incomingCall.incomingOffer)
@@ -132,7 +141,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
             socket.emit("makeAnswer", answer, channelID)
             peerConnection.onicecandidate = handleIceCandidate
             socket.on('receivedNewIceCandidate', (candidate:RTCIceCandidate) => {
-                peerConnection.addIceCandidate(candidate)
+                peerConnection?.addIceCandidate(candidate)
             })
             setCallActive(true)
         }
