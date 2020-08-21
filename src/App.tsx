@@ -57,7 +57,7 @@ const App: React.FC<ReduxProps> = ({setCurrentUser, currentUser}) => {
             <Route 
             exact 
             path='/chat/:channelId' 
-            component={ChatPage}/>
+            render={() => !currentUser? (<Redirect to='/'/>): (<ChatPage/>)}/>
           </Switch>
         }
     </Fragment>
