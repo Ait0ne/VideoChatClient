@@ -51,6 +51,7 @@ const ChatPage: React.FC<ReduxProps> = ({currentUser}) => {
                 toggleVideoChat={toggleVideoChat} 
                 channelID={channelId} userId={currentUser._id} 
                 incomingCall={incomingCall} 
+                setIncomingCall={setIncomingCall}
                 connectedUserName={currentUser.channels.find((channel) => {
                     return channel.channelID===channelId
                 }).name}
