@@ -20,8 +20,8 @@ interface VideoChatProps {
     } | undefined>>
 } 
 
-let mediaStream:MediaStream|null=null;
 let peer: Peer|null = null;
+let mediaStream:MediaStream|null=null;
 
 const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID, incomingCall, connectedUserName, setIncomingCall}) => {
     const localVideo = useRef<HTMLVideoElement>(null)
@@ -175,10 +175,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     //     toggleVideoChat()
     // }
 
-    const hangUp = useCallback(() => {
-
-
-
+    const hangUp = useCallback((mediaStream:MediaStream|null) => {
         if (mediaStream) {
             if (localVideo.current) {
                 localVideo.current.pause()
@@ -195,18 +192,16 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
         }
     }, [channelID])
     
-    console.log(callActive)
 
     useEffect(()=> {
+        socket.on('initiatedHangUp', () => {
+            hangUp(mediaStream)
+            toggleVideoChat(false)
+        })
         
         
         if (!incomingCall) {
-            console.log(incomingCall)
-            console.log(1)
-            socket.on('initiatedHangUp', () => {
-                hangUp()
-                toggleVideoChat(false)
-            })
+
             peer = new Peer(userId)
             socket.emit("callUser", userId, channelID)
             socket.on('answerMade', (connectedUserId:string, channelID:string)=> {
@@ -232,7 +227,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
         return () => {
             socket.removeListener("answerMade")
             socket.removeListener("initiatedHangUp")
-            hangUp()
+            hangUp(mediaStream)
             setIncomingCall(undefined)
         }
     }, [userId, channelID, hangUp, incomingCall, toggleVideoChat, setIncomingCall])
@@ -256,14 +251,11 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                 })
             })
         })
-        socket.on('initiatedHangUp', () => {
-            hangUp()
-            toggleVideoChat(false)
-        })
+
     }
 
     const handleCallEnd = () => {
-        hangUp()
+        hangUp(mediaStream)
         toggleVideoChat(false)
     }
 
