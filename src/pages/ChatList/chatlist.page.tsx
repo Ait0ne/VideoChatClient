@@ -33,8 +33,8 @@ const ChatListPage: React.FC<ReduxProps> = ({currentUser}) => {
     const [newMessage, setNewMessage] = useState<{message:IMessage, channelID:string}|undefined>()
     const [newChannel, setNewChannel] = useState<IChannel | undefined>()
 
-
     
+        
     
     useEffect(() => {
         const token = window.localStorage.getItem('token')
