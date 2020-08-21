@@ -32,8 +32,8 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     // const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [
     //     {
     //     urls: 'turn:numb.viagenie.ca',
-    //     credential: 'webrtc',
-    //     username: 'webrtc'
+    //     credential: 'ait0ne666',
+    //     username: 'bonafide112358@gmail.com'
     // },]}))
     
     
@@ -202,7 +202,11 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
         
         if (!incomingCall) {
 
-            peer = new Peer(userId)
+            peer = new Peer(userId, {config:{iceServers:[{ 
+                urls: 'turn:numb.viagenie.ca',
+                credential: 'ait0ne666',
+                username: 'bonafide112358@gmail.com'}]
+            }})
             socket.emit("callUser", userId, channelID)
             socket.on('answerMade', (connectedUserId:string, channelID:string)=> {
                 peer?.connect(connectedUserId)
@@ -236,7 +240,11 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     }, [userId, channelID, hangUp, incomingCall, toggleVideoChat, setIncomingCall])
 
     const handleCallStart = () => {
-        peer = new Peer(userId)
+        peer = new Peer(userId, {config:{iceServers:[{ 
+            urls: 'turn:numb.viagenie.ca',
+            credential: 'ait0ne666',
+            username: 'bonafide112358@gmail.com'}]
+        }})
         socket.emit("makeAnswer", userId, channelID)
         peer.on("call", (call) => {
             navigator.mediaDevices.getUserMedia({video:true, audio:true})
