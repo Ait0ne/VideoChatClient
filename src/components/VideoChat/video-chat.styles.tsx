@@ -14,9 +14,10 @@ z-index: 1000;
 justify-content: flex-start;
 background-color: #455A64;
 >video {
+    object-fit:cover;
     &:nth-of-type(1) {
         width:100%;
-        height: 100%
+        height: 100%;
     }
     &:nth-of-type(2) {
         position: absolute;
