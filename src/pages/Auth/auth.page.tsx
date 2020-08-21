@@ -9,14 +9,33 @@ import {
     AuthMainContainer, 
 } from './auth.styles';
 import {CustomButton} from '../../styles/styles';
-import {AuthMainVariants, SignInVariants} from '../../framer/variants';
+import {SignInVariants} from '../../framer/variants';
+import {useWindowDimensions} from '../../hooks/useWindowDimensions.hook';
 
+export const AuthMainVariants = {
+    visible: (height:number) => ({
+        clipPath: `circle(${0.7*height}px at 50% 50%)`,
+        filter: 'brightness(100%)',
+        transition: {
+            duration: 1.1,
+            delay: 0.1
+          }
+    }),
+    hidden: (height:number) => ({
+        clipPath: `circle(${0.55*height}px at 50% 0%)`,
+        filter: 'brightness(80%)',
+        transition: {
+            duration: 0.8
+          }
+    })
 
-
+}
 
 const AuthPage: React.FC = () => {
     const [showSignIn, setShowSignIn] = useState(false)
     const [showSignUp, setShowSignUp] = useState(false)
+    const {height} = useWindowDimensions()
+    console.log(height)
 
     const toggleShowSignUp = () => {
         setShowSignUp(!showSignUp)
@@ -32,6 +51,7 @@ const AuthPage: React.FC = () => {
             style={{backgroundImage: `url(${backgroundImage})`}}
             animate={showSignIn||showSignUp? 'hidden' : 'visible'}
             variants={AuthMainVariants}
+            custom={height}
             >
                 <CustomButton 
                 onClick={toggleShowsignIn}
@@ -49,12 +69,12 @@ const AuthPage: React.FC = () => {
             <AnimatePresence exitBeforeEnter>
             {
                 showSignIn?
-                    <SignInForm toggleShowSignIn={toggleShowsignIn}/>
+                    <SignInForm height={height} toggleShowSignIn={toggleShowsignIn}/>
                 :null
             }
                         {
                 showSignUp?
-                    <SignUpForm toggleShowSignIn={toggleShowSignUp}/>
+                    <SignUpForm height={height} toggleShowSignIn={toggleShowSignUp}/>
                 :null
             }
             </AnimatePresence>

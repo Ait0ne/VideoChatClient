@@ -1,21 +1,4 @@
-export const AuthMainVariants = {
-    visible: {
-        clipPath: 'circle(70vh at 50% 50%)',
-        filter: 'brightness(100%)',
-        transition: {
-            duration: 1.1,
-            delay: 0.1
-          }
-    },
-    hidden: {
-        clipPath: 'circle(55vh at 50% 0%)',
-        filter: 'brightness(80%)',
-        transition: {
-            duration: 0.8
-          }
-    }
 
-}
 
 export const SignInVariants = {
     visible: {

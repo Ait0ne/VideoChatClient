@@ -32,8 +32,14 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
 
     const hangUp = useCallback(() => {
         peerConnection.close()
-        socket.emit('hangup', channelID)
-    }, [userId, channelID])
+        navigator.mediaDevices.getUserMedia()
+        .then(stream => {
+            socket.emit('hangup', channelID)
+            stream.getTracks().forEach(track => {
+                track.stop();
+            })
+        })
+    }, [channelID])
 
 
     useEffect(() => {
@@ -81,6 +87,12 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
 
         socket.on('initiatedHangUp', () => {
             peerConnection.close()
+            navigator.mediaDevices.getUserMedia()
+            .then(stream => {
+                stream.getTracks().forEach(track => {
+                    track.stop();
+                })
+            })
             toggleVideoChat()
         })
 

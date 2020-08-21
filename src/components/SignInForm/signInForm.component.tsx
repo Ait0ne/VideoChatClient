@@ -13,11 +13,12 @@ import {setCurrentUser} from '../../redux/user/user.actions';
 
 export interface ISignIn {
     setCurrentUser: (user:IUser|null) => void,
-    toggleShowSignIn: () => void
+    toggleShowSignIn: () => void,
+    height: number
 }
 
 
-const SignInForm: React.FC<ISignIn> = ({setCurrentUser, toggleShowSignIn}) => {
+const SignInForm: React.FC<ISignIn> = ({setCurrentUser, toggleShowSignIn, height}) => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
@@ -57,7 +58,7 @@ const SignInForm: React.FC<ISignIn> = ({setCurrentUser, toggleShowSignIn}) => {
         initial={{y: '100%', opacity: 0}}
         animate={{y:'0%', opacity: 1, transition: {delay: 0.3, duration: 0.8}}}
         exit={{y: '100%', opacity: 0, transition: { duration: 0.8}}}
-        
+        height={height}
         >
             <div>
                 <FontAwesomeIcon onClick={toggleShowSignIn} icon={faTimes}/>

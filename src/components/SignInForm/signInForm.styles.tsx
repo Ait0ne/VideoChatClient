@@ -1,17 +1,22 @@
 import styled from 'styled-components';
 import { FlexContainer} from '../../styles/styles';
 
-export const SignInFormContainer = styled(FlexContainer)`
+interface SignInFormContainerProps {
+    height: number
+}
+
+
+export const SignInFormContainer = styled(FlexContainer)<SignInFormContainerProps>`
 position: absolute;
 bottom: 0;
-height: 45vh;
+height: ${props => props.height*0.45}px;
 width: 100%;
 >div {
     display: flex;
     justify-content: center;
     align-items: center;
     position: absolute;
-    bottom: calc(45vh - 15px);
+    bottom: ${props => `calc(${0.45*props.height-15}px)`};
     background-color: white;
     border: 1px solid rgba(0,0,0,0.2);
     width: 30px;
