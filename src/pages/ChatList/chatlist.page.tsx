@@ -102,7 +102,9 @@ const ChatListPage: React.FC<ReduxProps> = ({currentUser, setCurrentUser}) => {
     return (
         <ChatListContainer>
             <Navigation />
-
+            {
+                console.log(channels)
+            }
             <AddChannelDialog />
             <ChannelList channels={channels.filter((channel) => channel.lastMessage)} userID={currentUser._id}/>
         </ChatListContainer>
