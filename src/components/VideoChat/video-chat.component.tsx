@@ -31,11 +31,6 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     const localVideo = useRef<HTMLVideoElement>(null)
     const remoteVideo = useRef<HTMLVideoElement>(null)
     const [callActive, setCallActive] = useState(false)
-    
-    useEffect(() => {
-        console.log('toggle',toggleVideoChat, 'userID',userId, 'channel', channelID, 'inccall',incomingCall, 'name',connectedUserName, 'setinccall',setIncomingCall, 'setoutcall',setOutGoingCall)
-    }, [])
-
 
     // const {RTCPeerConnection, RTCSessionDescription} = window
     // const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [
