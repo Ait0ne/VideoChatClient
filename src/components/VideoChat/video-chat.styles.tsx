@@ -10,7 +10,7 @@ height: 100%;
 position: absolute;
 top: 0;
 left: 0;
-z-index: 1000;
+z-index: 1200;
 justify-content: flex-start;
 background-color: #455A64;
 >video {

@@ -95,7 +95,7 @@ const App: React.FC<ReduxProps> = ({setCurrentUser, currentUser}) => {
             <Route 
             exact 
             path='/chat/:channelId' 
-            render={() => !currentUser? (<Redirect to='/'/>): (<ChatPage/>)}/>
+            render={() => !currentUser? (<Redirect to='/'/>): (<ChatPage setOutGoingCall={setOutGoingCall}/>)}/>
           </Switch>
         }
         {
@@ -105,7 +105,7 @@ const App: React.FC<ReduxProps> = ({setCurrentUser, currentUser}) => {
           setIncomingCall={setIncomingCall} 
           incomingCall={incomingCall} 
           userId={currentUser._id}
-          channelID={incomingCall? incomingCall.incomingChannelID : outgoingCall? outgoingCall.connectedUserName : ''}
+          channelID={incomingCall? incomingCall.incomingChannelID : outgoingCall? outgoingCall.channelID : ''}
           setOutGoingCall={setOutGoingCall}
           connectedUserName={
             incomingCall? 

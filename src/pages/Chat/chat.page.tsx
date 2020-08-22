@@ -9,7 +9,7 @@ import Chat from '../../components/Chat/chat.component';
 import {StateProps} from '../../redux/root-reducer';
 
 interface ChatPageProps {
-    setOutGoingCall?: React.Dispatch<React.SetStateAction<{
+    setOutGoingCall: React.Dispatch<React.SetStateAction<{
         channelID: string;
         connectedUserName: string;
     } | undefined>>

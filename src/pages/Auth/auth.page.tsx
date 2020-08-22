@@ -35,7 +35,6 @@ const AuthPage: React.FC = () => {
     const [showSignIn, setShowSignIn] = useState(false)
     const [showSignUp, setShowSignUp] = useState(false)
     const {height} = useWindowDimensions()
-    console.log(height)
 
     const toggleShowSignUp = () => {
         setShowSignUp(!showSignUp)
