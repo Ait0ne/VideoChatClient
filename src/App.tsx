@@ -9,7 +9,7 @@ import {IUser} from './redux/user/user.types';
 import {setCurrentUser} from './redux/user/user.actions';
 import {API_URL} from './config';
 import {StateProps} from './redux/root-reducer';
-
+import VideoChat from './components/VideoChat/video-chat.component';
 
 import AuthPage from './pages/Auth/auth.page';
 import ChatListPage from './pages/ChatList/chatlist.page';
@@ -20,6 +20,41 @@ export const socket = io(API_URL)
 
 const App: React.FC<ReduxProps> = ({setCurrentUser, currentUser}) => {
   const [loading, setLoading] = useState(true)
+
+  const [videoChatShown, setVideoChatShown] = useState(false)
+  const [incomingCall, setIncomingCall] = useState<{incomingOffer:RTCSessionDescriptionInit, incomingChannelID:string} |undefined>()
+  const [outgoingCall, setOutGoingCall] = useState<{channelID: string, connectedUserName:string}|undefined>()
+
+
+  useEffect(() => {
+      socket.on('incomingCall', (offer: RTCSessionDescriptionInit, ID:string)=>
+          {
+              console.log('incoming')
+              setIncomingCall({incomingOffer: offer, incomingChannelID: ID})
+          }
+      )
+      return () => {
+          socket.removeListener('incomingCall')
+      }
+  }, [])
+
+  useEffect(() => {
+      if (incomingCall) {
+          setVideoChatShown(true)
+      }
+  }, [incomingCall])
+
+  useEffect(()=> {
+    if (outgoingCall) {
+      setVideoChatShown(true)
+    }
+  }, [outgoingCall])
+
+  const toggleVideoChat = () => {
+      setVideoChatShown(!videoChatShown)
+  }
+
+
 
   useEffect(() => {
     const token = window.localStorage.getItem('token');
@@ -45,7 +80,8 @@ const App: React.FC<ReduxProps> = ({setCurrentUser, currentUser}) => {
     }
   }, [setCurrentUser])
 
-  
+
+
 
   return (
     <Fragment>
@@ -61,6 +97,26 @@ const App: React.FC<ReduxProps> = ({setCurrentUser, currentUser}) => {
             path='/chat/:channelId' 
             render={() => !currentUser? (<Redirect to='/'/>): (<ChatPage/>)}/>
           </Switch>
+        }
+        {
+          videoChatShown&&currentUser?
+          <VideoChat  
+          toggleVideoChat={toggleVideoChat} 
+          setIncomingCall={setIncomingCall} 
+          incomingCall={incomingCall} 
+          userId={currentUser._id}
+          channelID={incomingCall? incomingCall.incomingChannelID : outgoingCall? outgoingCall.connectedUserName : ''}
+          setOutGoingCall={setOutGoingCall}
+          connectedUserName={
+            incomingCall? 
+            currentUser.channels.find((channel) => {
+              return channel.channelID===incomingCall.incomingChannelID
+            }).name
+            :
+            outgoingCall?.connectedUserName
+          }
+          />
+          : null
         }
     </Fragment>
   );

@@ -15,11 +15,15 @@ import {IUser} from '../../redux/user/user.types';
 interface NavigationProps {
     backNavigation?: boolean,
     videoCallButton?: boolean,
-    toggleVideoChat?: () => void,
-    pageTitle?: string
+    pageTitle?: string,
+    setOutGoingCall?: React.Dispatch<React.SetStateAction<{
+        channelID: string;
+        connectedUserName: string;
+    } | undefined>>,
+    channelId?:string
 }
 
-const Navigation: React.FC<ReduxProps&NavigationProps> = ({setCurrentUser, backNavigation, videoCallButton, toggleVideoChat, pageTitle}) => {
+const Navigation: React.FC<ReduxProps&NavigationProps> = ({setCurrentUser, backNavigation, videoCallButton, pageTitle, setOutGoingCall, channelId}) => {
     const [profileMenuShown, setprofileMenuShown] = useState(false)
     const profileMenuAnchor = useRef(null)
 
@@ -45,7 +49,11 @@ const Navigation: React.FC<ReduxProps&NavigationProps> = ({setCurrentUser, backN
     }
 
 
-
+    const handleVideoChatOpen = () =>  {
+        if (setOutGoingCall&&channelId) {
+            setOutGoingCall({channelID:channelId, connectedUserName: pageTitle? pageTitle: ''})
+        }
+    }
 
     return (
         <Fragment>
@@ -70,7 +78,7 @@ const Navigation: React.FC<ReduxProps&NavigationProps> = ({setCurrentUser, backN
                     <FlexContainer direction='row'>
                         {
                             videoCallButton?
-                            <IconButton onClick={toggleVideoChat}>
+                            <IconButton onClick={handleVideoChatOpen}>
                                 <VideoCall color='secondary' fontSize='large'/>
                             </IconButton>
                             :null

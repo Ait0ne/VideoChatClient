@@ -17,13 +17,17 @@ interface VideoChatProps {
     setIncomingCall: React.Dispatch<React.SetStateAction<{
         incomingOffer: RTCSessionDescriptionInit;
         incomingChannelID: string;
+    } | undefined>>,
+    setOutGoingCall: React.Dispatch<React.SetStateAction<{
+        channelID: string;
+        connectedUserName: string;
     } | undefined>>
 } 
 
 let peer: Peer|null = null;
 let mediaStream:MediaStream|null=null;
 
-const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID, incomingCall, connectedUserName, setIncomingCall}) => {
+const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID, incomingCall, connectedUserName, setIncomingCall, setOutGoingCall}) => {
     const localVideo = useRef<HTMLVideoElement>(null)
     const remoteVideo = useRef<HTMLVideoElement>(null)
     const [callActive, setCallActive] = useState(false)
@@ -236,6 +240,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
             socket.removeListener("initiatedHangUp")
             hangUp(mediaStream)
             setIncomingCall(undefined)
+            setOutGoingCall(undefined)
         }
     }, [userId, channelID, hangUp, incomingCall, toggleVideoChat, setIncomingCall])
 

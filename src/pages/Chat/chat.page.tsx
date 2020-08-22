@@ -1,63 +1,30 @@
-import React, {Fragment, useState, useEffect} from 'react';
+import React, {Fragment} from 'react';
 import {useParams} from 'react-router-dom';
 import {connect, ConnectedProps} from 'react-redux';
-import {socket} from '../../App';
+
 
 // import {IChannel} from '../ChatList/chatlist.page';
 import Navigation from '../../components/Navigation/navigation.component';
 import Chat from '../../components/Chat/chat.component';
-import VideoChat from '../../components/VideoChat/video-chat.component';
 import {StateProps} from '../../redux/root-reducer';
 
+interface ChatPageProps {
+    setOutGoingCall?: React.Dispatch<React.SetStateAction<{
+        channelID: string;
+        connectedUserName: string;
+    } | undefined>>
+}
 
-const ChatPage: React.FC<ReduxProps> = ({currentUser}) => {
+const ChatPage: React.FC<ReduxProps&ChatPageProps> = ({currentUser, setOutGoingCall}) => {
     const {channelId} = useParams()
-    const [videoChatShown, setVideoChatShown] = useState(false)
-    const [incomingCall, setIncomingCall] = useState<{incomingOffer:RTCSessionDescriptionInit, incomingChannelID:string} |undefined>()
-
-    useEffect(() => {
-        socket.on('incomingCall', (offer: RTCSessionDescriptionInit, ID:string)=>
-            {
-                console.log('incoming')
-                setIncomingCall({incomingOffer: offer, incomingChannelID: ID})
-            }
-        )
-        return () => {
-            socket.removeListener('incomingCall')
-        }
-    }, [])
-
-    useEffect(() => {
-        if (incomingCall) {
-            setVideoChatShown(true)
-        }
-    }, [incomingCall])
-
-    const toggleVideoChat = () => {
-        setVideoChatShown(!videoChatShown)
-    }
-
-    const connectedUserName:string=currentUser.channels.find((channel) => {
+    const connectedUserName = currentUser.channels.find((channel) => {
         return channel.channelID===channelId
-    }).name
-
-    
+      }).name
 
     return (
         <Fragment>
-            <Navigation videoCallButton backNavigation pageTitle={connectedUserName} toggleVideoChat={toggleVideoChat}/>
+            <Navigation videoCallButton backNavigation pageTitle={connectedUserName} setOutGoingCall={setOutGoingCall} channelId={channelId}/>
             <Chat channelId={channelId} currentUser={currentUser}/>
-            {
-                videoChatShown?
-                <VideoChat 
-                toggleVideoChat={toggleVideoChat} 
-                channelID={channelId} userId={currentUser._id} 
-                incomingCall={incomingCall} 
-                setIncomingCall={setIncomingCall}
-                connectedUserName={connectedUserName}
-                />
-                : null
-            }
         </Fragment>
     )
 
