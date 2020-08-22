@@ -5,4 +5,5 @@ export const CustomFab = materialStyled(Fab)({
     position: 'absolute',
     right: '20px',
     bottom: '20px',
+
     })

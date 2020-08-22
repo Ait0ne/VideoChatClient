@@ -53,13 +53,17 @@ const SignInForm: React.FC<ISignIn> = ({setCurrentUser, toggleShowSignIn, height
             setConfirmPassword('')
             axios.post(`${API_URL}signup`, data)
             .then(response => {
-                const { data: { token, ...user} } = response
-       
-                saveJWTToken(token)
-                setCurrentUser(user)
+                if (response.data.error) {
+                    alert(response.data.error)
+                } else {
+                    const { data: { token, ...user} } = response
+           
+                    saveJWTToken(token)
+                    setCurrentUser(user)
+                }
             })
             .catch(err =>  {
-                console.log(err)
+                alert('Failed to create user')
             })
         }
     }
@@ -76,10 +80,10 @@ const SignInForm: React.FC<ISignIn> = ({setCurrentUser, toggleShowSignIn, height
                 <FontAwesomeIcon onClick={toggleShowSignIn} icon={faTimes}/>
             </div>
             <form  onSubmit={handleSubmit}>
-                <input placeholder='UserName' name='userName' onChange={handleChange} type='text' value={userName}/>
-                <input placeholder='Email' name='email' onChange={handleChange} type='email' value={email}/>
-                <input placeholder='Password' name='password' onChange={handleChange} type='password' value={password} />
-                <input placeholder='Confirm password' name='confirmPassword' onChange={handleChange} type='password' value={confirmPassword} />
+                <input placeholder='UserName' name='userName' onChange={handleChange} type='text' value={userName} required/>
+                <input placeholder='Email' name='email' onChange={handleChange} type='email' value={email} required/>
+                <input placeholder='Password' name='password' onChange={handleChange} type='password' value={password} required/>
+                <input placeholder='Confirm password' name='confirmPassword' onChange={handleChange} type='password' value={confirmPassword} required/>
                 <CustomButton type='submit' shadow={true}>Sign Up</CustomButton>
             </form>
         </SignUpFormContainer>

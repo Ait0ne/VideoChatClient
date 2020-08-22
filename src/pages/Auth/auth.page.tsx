@@ -36,6 +36,8 @@ const AuthPage: React.FC = () => {
     const [showSignUp, setShowSignUp] = useState(false)
     const {height} = useWindowDimensions()
 
+    const rootHeight = height>900? 900 : height
+
     const toggleShowSignUp = () => {
         setShowSignUp(!showSignUp)
     }
@@ -50,7 +52,7 @@ const AuthPage: React.FC = () => {
             style={{backgroundImage: `url(${backgroundImage})`}}
             animate={showSignIn||showSignUp? 'hidden' : 'visible'}
             variants={AuthMainVariants}
-            custom={height}
+            custom={rootHeight}
             >
                 <CustomButton 
                 onClick={toggleShowsignIn}
@@ -68,12 +70,12 @@ const AuthPage: React.FC = () => {
             <AnimatePresence exitBeforeEnter>
             {
                 showSignIn?
-                    <SignInForm height={height} toggleShowSignIn={toggleShowsignIn}/>
+                    <SignInForm height={rootHeight} toggleShowSignIn={toggleShowsignIn}/>
                 :null
             }
                         {
                 showSignUp?
-                    <SignUpForm height={height} toggleShowSignIn={toggleShowSignUp}/>
+                    <SignUpForm height={rootHeight} toggleShowSignIn={toggleShowSignUp}/>
                 :null
             }
             </AnimatePresence>

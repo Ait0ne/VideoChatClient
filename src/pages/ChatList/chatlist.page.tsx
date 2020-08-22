@@ -1,10 +1,12 @@
-import React, {useState,  useEffect} from 'react';
+import React, {useState,  useEffect, Dispatch} from 'react';
 import {connect, ConnectedProps } from 'react-redux';
 
 import {
     ChatListContainer,
 } from './chatlist.styles';
 
+import {IUser} from '../../redux/user/user.types';
+import {setCurrentUser} from '../../redux/user/user.actions';
 import {IMessage} from '../../components/Chat/chat.component';
 import {socket} from '../../App';
 import AddChannelDialog from '../../components/AddChannelDialog/addChannelDialog.component';
@@ -28,7 +30,7 @@ export interface IChannel {
 
 
 
-const ChatListPage: React.FC<ReduxProps> = ({currentUser}) => {
+const ChatListPage: React.FC<ReduxProps> = ({currentUser, setCurrentUser}) => {
     const [channels, setChannels] = useState<IChannel[]>([])
     const [newMessage, setNewMessage] = useState<{message:IMessage, channelID:string}|undefined>()
     const [newChannel, setNewChannel] = useState<IChannel | undefined>()
@@ -51,7 +53,8 @@ const ChatListPage: React.FC<ReduxProps> = ({currentUser}) => {
             setChannels(channels)
         })
     
-        socket.on('newChannel', (channel: IChannel) => {
+        socket.on('newChannel', (channel: IChannel, user: IUser) => {
+            setCurrentUser(user)
             socket.emit('joinNewChannel', channel._id)
             setNewChannel(channel)
         })
@@ -65,7 +68,7 @@ const ChatListPage: React.FC<ReduxProps> = ({currentUser}) => {
             socket.emit('leave', currentUser._id)
             
         }
-    }, [currentUser])
+    }, [currentUser, setCurrentUser])
 
 
     useEffect(() => {
@@ -110,9 +113,12 @@ const mapStateToProps = (state:StateProps) => ({
     currentUser: state.user.currentUser
 })
 
+const mapDispatchToProps = (dispatch: Dispatch<any>) => ({
+    setCurrentUser: (user:IUser|null) => dispatch(setCurrentUser(user))
+    })
 
 
-const connector = connect(mapStateToProps)
+const connector = connect(mapStateToProps, mapDispatchToProps)
 
 type ReduxProps = ConnectedProps<typeof connector>
 

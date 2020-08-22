@@ -10,7 +10,6 @@ import {
 from '@material-ui/core';
 import moment from 'moment';
 
-
 import {ChannelListContainer, CustomBadge, CustomList, CustomListItemText, CustomAccountCircle} from './channel-list.styles';
 import {IChannel} from '../../pages/ChatList/chatlist.page';
 
@@ -68,5 +67,7 @@ const ChannelList:React.FC<ChannelListProps> = ({channels, userID}) => {
         </ChannelListContainer>
     )
 }
+
+
 
 export default ChannelList;

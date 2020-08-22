@@ -17,7 +17,10 @@ interface ChatPageProps {
 
 const ChatPage: React.FC<ReduxProps&ChatPageProps> = ({currentUser, setOutGoingCall}) => {
     const {channelId} = useParams()
+    
     const connectedUserName = currentUser.channels.find((channel) => {
+        console.log(channel)
+        console.log(currentUser)
         return channel.channelID===channelId
       }).name
 

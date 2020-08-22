@@ -102,7 +102,7 @@ const Chat:React.FC<ChatProps> = ({channelId, currentUser}) => {
                 {
                     messages.sort((a, b) => {
                         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-                    }).map((message) => <ChatMessage key={message._id} message={message}/>)
+                    }).map((message, i) => <ChatMessage key={i} message={message}/>)
                 }
             </ChatBodyContainer>
             <ChatInputContainer>

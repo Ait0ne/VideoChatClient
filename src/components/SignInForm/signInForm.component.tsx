@@ -42,13 +42,17 @@ const SignInForm: React.FC<ISignIn> = ({setCurrentUser, toggleShowSignIn, height
         setPassword('')
         axios.post(`${API_URL}login`, data)
         .then(response => {
-            const { data: { token, ...user} } = response
-   
-            saveJWTToken(token)
-            setCurrentUser(user)
+            console.log(response.data)
+            if (response.data.error) {
+                alert('Incorrect email or password')
+            } else {
+                const { data: { token, ...user} } = response
+                saveJWTToken(token)
+                setCurrentUser(user)
+            }
         })
-        .catch(err =>  {
-            console.log(err)
+        .catch((err:Error) =>  {
+            alert('Incorrect email or password')
         })
     }
 
@@ -64,8 +68,8 @@ const SignInForm: React.FC<ISignIn> = ({setCurrentUser, toggleShowSignIn, height
                 <FontAwesomeIcon onClick={toggleShowSignIn} icon={faTimes}/>
             </div>
             <form  onSubmit={handleSubmit}>
-                <input placeholder='Email' name='email' onChange={handleChange} type='email' value={email}/>
-                <input placeholder='Password' name='password' onChange={handleChange} type='password' value={password} />
+                <input placeholder='Email' name='email' onChange={handleChange} type='email' value={email} required/>
+                <input placeholder='Password' name='password' onChange={handleChange} type='password' value={password} required/>
                 <CustomButton type='submit' shadow={true}>Login</CustomButton>
             </form>
         </SignInFormContainer>

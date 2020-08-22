@@ -63,6 +63,7 @@ const App: React.FC<ReduxProps> = ({setCurrentUser, currentUser}) => {
             headers: {"Authorization": token}
         } )
         .then(response => {
+          console.log(response)
             if (response.data.user) {
                 setCurrentUser(response.data.user)
                 setLoading(false)
