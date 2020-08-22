@@ -1,11 +1,13 @@
 import React from 'react';
-import {FlexContainer} from '../../styles/styles';
+import {CircularProgress} from '@material-ui/core'
+
+import {FallbackContainer} from './fallback.styles';
 
 const Fallback: React.FC = () => {
     return (
-        <FlexContainer>
-            <span>...Loading</span>
-        </FlexContainer>
+        <FallbackContainer>
+            <CircularProgress color='primary' />
+        </FallbackContainer>
     )
 }
 

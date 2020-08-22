@@ -37,13 +37,15 @@ const ChatPage: React.FC<ReduxProps> = ({currentUser}) => {
         setVideoChatShown(!videoChatShown)
     }
 
-
+    const connectedUserName:string=currentUser.channels.find((channel) => {
+        return channel.channelID===channelId
+    }).name
 
     
 
     return (
         <Fragment>
-            <Navigation videoCallButton backNavigation toggleVideoChat={toggleVideoChat}/>
+            <Navigation videoCallButton backNavigation pageTitle={connectedUserName} toggleVideoChat={toggleVideoChat}/>
             <Chat channelId={channelId} currentUser={currentUser}/>
             {
                 videoChatShown?
@@ -51,9 +53,7 @@ const ChatPage: React.FC<ReduxProps> = ({currentUser}) => {
                 toggleVideoChat={toggleVideoChat} 
                 channelID={channelId} userId={currentUser._id} 
                 incomingCall={incomingCall} 
-                connectedUserName={currentUser.channels.find((channel) => {
-                    return channel.channelID===channelId
-                }).name}
+                connectedUserName={connectedUserName}
                 />
                 : null
             }

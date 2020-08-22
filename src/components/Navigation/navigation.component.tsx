@@ -15,10 +15,11 @@ import {IUser} from '../../redux/user/user.types';
 interface NavigationProps {
     backNavigation?: boolean,
     videoCallButton?: boolean,
-    toggleVideoChat?: () => void
+    toggleVideoChat?: () => void,
+    pageTitle?: string
 }
 
-const Navigation: React.FC<ReduxProps&NavigationProps> = ({setCurrentUser, backNavigation, videoCallButton, toggleVideoChat}) => {
+const Navigation: React.FC<ReduxProps&NavigationProps> = ({setCurrentUser, backNavigation, videoCallButton, toggleVideoChat, pageTitle}) => {
     const [profileMenuShown, setprofileMenuShown] = useState(false)
     const profileMenuAnchor = useRef(null)
 
@@ -61,7 +62,9 @@ const Navigation: React.FC<ReduxProps&NavigationProps> = ({setCurrentUser, backN
                             : null
                         }
                         <Typography >
-                            Contacts
+                            {
+                                pageTitle? `${pageTitle}`: 'Contacts'
+                            }
                         </Typography>
                     </FlexContainer>
                     <FlexContainer direction='row'>

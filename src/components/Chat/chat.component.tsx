@@ -9,7 +9,7 @@ import {IUser} from '../../redux/user/user.types';
 
 interface ChatProps {
     channelId:string,
-    currentUser: IUser
+    currentUser: IUser,
 }
 
 
