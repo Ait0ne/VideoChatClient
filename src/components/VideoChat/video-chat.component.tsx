@@ -32,6 +32,11 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     const remoteVideo = useRef<HTMLVideoElement>(null)
     const [callActive, setCallActive] = useState(false)
     
+    useEffect(() => {
+        console.log('toggle',toggleVideoChat, 'userID',userId, 'channel', channelID, 'inccall',incomingCall, 'name',connectedUserName, 'setinccall',setIncomingCall, 'setoutcall',setOutGoingCall)
+    }, [])
+
+
     // const {RTCPeerConnection, RTCSessionDescription} = window
     // const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [
     //     {
@@ -181,7 +186,6 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
 
     const hangUp = useCallback((mediaStream:MediaStream|null) => {
         if (mediaStream) {
-            console.log(2)
             if (localVideo.current) {
                 localVideo.current.pause()
                 localVideo.current.srcObject=null
@@ -200,25 +204,17 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
 
     useEffect(()=> {
         socket.on('initiatedHangUp', () => {
-            console.log('hangup')
             hangUp(mediaStream)
             toggleVideoChat(false)
         })
-        
-        
         if (!incomingCall) {
-            peer = new Peer(userId, {config:{iceServers:[{ 
-                urls: 'turn:numb.viagenie.ca',
-                credential: 'ait0ne666',
-                username: 'bonafide112358@gmail.com'}]
-            }})
+            peer = new Peer(userId)
             console.log(userId, channelID)
             socket.emit("callUser", userId, channelID)
-            socket.on('answerMade', (connectedUserId:string, channelID:string)=> {
+            socket.on('answerMade', (connectedUserId:string, id:string)=> {
                 peer?.connect(connectedUserId)
                 navigator.mediaDevices.getUserMedia({video:true, audio:true})
                 .then((stream:MediaStream) => {
-                    console.log(stream)
                     mediaStream = stream
                     const call = peer?.call(connectedUserId, stream)
                     if (localVideo.current) {
@@ -232,7 +228,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
                     })
                 })
                 .catch(() => {
-                    socket.emit('hangup', channelID)
+                    socket.emit('hangup', id)
                     peer?.disconnect()
                     toggleVideoChat(false)
                 })
@@ -247,22 +243,15 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
             socket.removeListener("answerMade")
             socket.removeListener("initiatedHangUp")
             hangUp(mediaStream)
-            console.log(1)
             setIncomingCall(undefined)
             setOutGoingCall(undefined)
         }
     }, [userId, channelID, hangUp, incomingCall, toggleVideoChat, setIncomingCall, setOutGoingCall])
 
     const handleCallStart = () => {
-        peer = new Peer(userId, {config:{iceServers:[{ 
-            urls: 'turn:numb.viagenie.ca',
-            credential: 'ait0ne666',
-            username: 'bonafide112358@gmail.com'}]
-        }})
-        console.log(userId, channelID)
+        peer = new Peer(userId)
         socket.emit("makeAnswer", userId, channelID)
         peer.on("call", (call) => {
-            console.log('getting media')
             navigator.mediaDevices.getUserMedia({video:true, audio:true})
             .then((stream) => {
                 mediaStream = stream
@@ -285,6 +274,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
         })
         peer?.on("error", (err) => {
             hangUp(mediaStream)
+
         })
 
     }
@@ -296,6 +286,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
 
     return (
         <VideoChatContainer>
+            {console.log(channelID, userId, incomingCall)}
             {
                 !callActive?
                 <Fragment>
