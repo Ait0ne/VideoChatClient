@@ -53,6 +53,7 @@ const ChatPage: React.FC<ReduxProps> = ({currentUser}) => {
                 toggleVideoChat={toggleVideoChat} 
                 channelID={channelId} userId={currentUser._id} 
                 incomingCall={incomingCall} 
+                setIncomingCall={setIncomingCall}
                 connectedUserName={connectedUserName}
                 />
                 : null

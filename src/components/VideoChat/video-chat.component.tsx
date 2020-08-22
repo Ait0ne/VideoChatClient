@@ -3,10 +3,10 @@ import React, {useRef, useEffect, useState, Fragment, useCallback} from 'react';
 import {VideoChatContainer, CallHeaderContainer, ConnectedUserAvatar, CustomAccountCircle, VideoChatActionButtons} from './video-chat.styles';
 import {socket} from '../../App';
 import {Call, CallEnd} from '@material-ui/icons';
-
+import Peer from 'peerjs'
 
 interface VideoChatProps {
-    toggleVideoChat: () => void,
+    toggleVideoChat: React.Dispatch<React.SetStateAction<boolean>>,
     userId: string,
     channelID: string,
     incomingCall?: {
@@ -14,144 +14,264 @@ interface VideoChatProps {
         incomingChannelID: string
     },
     connectedUserName: string;
+    setIncomingCall: React.Dispatch<React.SetStateAction<{
+        incomingOffer: RTCSessionDescriptionInit;
+        incomingChannelID: string;
+    } | undefined>>
 } 
 
-const {RTCPeerConnection, RTCSessionDescription} = window
-let peerConnection:RTCPeerConnection|null = new RTCPeerConnection({iceServers: [{urls:'stun:stun.l.google.com:19302'},  {
-    urls: 'turn:relay.backups.cz',
-    credential: 'webrtc',
-    username: 'webrtc'
-},]})
+let peer: Peer|null = null;
+let mediaStream:MediaStream|null=null;
 
-
-
-const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID, incomingCall, connectedUserName}) => {
+const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID, incomingCall, connectedUserName, setIncomingCall}) => {
     const localVideo = useRef<HTMLVideoElement>(null)
     const remoteVideo = useRef<HTMLVideoElement>(null)
     const [callActive, setCallActive] = useState(false)
-
-    const hangUp = useCallback(() => {
-        peerConnection?.close()
-        navigator.mediaDevices.getUserMedia({video: true, audio:true})
-        .then(stream => {
-            socket.emit('hangup', channelID)
-            stream.getTracks().forEach(track => {
-                track.stop();
-            })
-        })
-        peerConnection = null
-    }, [channelID])
-
-
-    useEffect(() => {
-        if (!incomingCall&&peerConnection) {
-            
-            const handleIceCandidate = (event: RTCPeerConnectionIceEvent) => {
-                if (event.candidate) {
-                    socket.emit('newIceCandidate', event.candidate, channelID)
-                }
-            }
-            peerConnection.ontrack = (event:RTCTrackEvent) => {
-                if (remoteVideo.current) {
-                    remoteVideo.current.srcObject = event.streams[0]
-                }
-            }
-            
-            navigator.mediaDevices.getUserMedia({video:true, audio:true})
-            .then(stream => {
-                console.log('call')
-                if (localVideo.current) {
-                    localVideo.current.srcObject = stream;
-                }
-                stream.getTracks().forEach(track => {
-                    console.log('track',track)
-                    peerConnection?.addTrack(track, stream)
-                })
-                const callUser = async () => {
-                    if (peerConnection) {
-                        const offer = await peerConnection.createOffer({offerToReceiveAudio: true, offerToReceiveVideo: true})
-                        await peerConnection.setLocalDescription(new RTCSessionDescription(offer))
-                        socket.emit("callUser", offer, channelID)
-
-                    }
-                }
-                callUser()
     
-                socket.on('answerMade', async (answer:RTCSessionDescriptionInit, channelID:string)=> {
-                    if (peerConnection) {
-                        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
-                        peerConnection.onicecandidate = handleIceCandidate
-                        setCallActive(true)
-                    }
-                })
-                socket.on('receivedNewIceCandidate', (candidate:RTCIceCandidate) => {
-                    console.log('newicecandidate')
-                    peerConnection?.addIceCandidate(candidate)
-                })
-            })
+    // const {RTCPeerConnection, RTCSessionDescription} = window
+    // const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [
+    //     {
+    //     urls: 'turn:numb.viagenie.ca',
+    //     credential: 'ait0ne666',
+    //     username: 'bonafide112358@gmail.com'
+    // },]}))
+    
+    
+    // const hangUp = useCallback(() => {
+    //     if (mediaStream) {
+    //         if (localVideo.current) {
+    //             localVideo.current.pause()
+    //             localVideo.current.srcObject=null
+    //         }
+    //         if (remoteVideo.current) {
+    //             remoteVideo.current.pause()
+    //             remoteVideo.current.srcObject=null
+    //         }
+    //         mediaStream.getTracks().forEach(track => track.stop())
+    //         mediaStream=null
+    //         socket.emit('hangup', channelID)
+    //         peerConnection?.close()
+    //         setPeerConnection(null)
+    //     }
+    // }, [channelID, peerConnection])
 
-            .catch(err => console.log(err))
+
+
+    // useEffect(() => {
+        
+    //     if (!incomingCall&&peerConnection) {
+            
+    //         const handleIceCandidate = (event: RTCPeerConnectionIceEvent) => {
+    //             if (event.candidate) {
+    //                 socket.emit('newIceCandidate', event.candidate, channelID)
+    //             }
+    //         }
+    //         peerConnection.ontrack = (event:RTCTrackEvent) => {
+    //             console.log(event)
+    //             if (remoteVideo.current) {
+    //                 remoteVideo.current.srcObject = event.streams[0]
+    //             }
+    //         }
+            
+    //         navigator.mediaDevices.getUserMedia({video:true, audio:true})
+    //         .then(stream => {
+    //             mediaStream=stream
+    //             if (localVideo.current) {
+    //                 localVideo.current.srcObject = stream;
+    //             }
+    //             stream.getTracks().forEach(track => {
+    //                 peerConnection?.addTrack(track, stream)
+    //             })
+    //             const callUser = async () => {
+    //                 if (peerConnection) {
+    //                     const offer = await peerConnection.createOffer({offerToReceiveAudio: true, offerToReceiveVideo: true})
+    //                     await peerConnection.setLocalDescription(new RTCSessionDescription(offer))
+    //                     socket.emit("callUser", offer, channelID)
+
+    //                 }
+    //             }
+    //             callUser()
+    
+    //             socket.on('answerMade', async (answer:RTCSessionDescriptionInit, channelID:string)=> {
+    //                 if (peerConnection) {
+    //                     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
+    //                     peerConnection.onicecandidate = handleIceCandidate
+    //                     setCallActive(true)
+    //                 }
+    //             })
+    //             socket.on('receivedNewIceCandidate', (candidate:RTCIceCandidate) => {
+    //                 console.log('newicecandidate')
+    //                 peerConnection?.addIceCandidate(candidate)
+    //             })
+    //         })
+
+    //         .catch(err => console.log(err))
+    //     }
+
+    //     socket.on('initiatedHangUp', () => {
+    //         if (localVideo.current) {
+    //             localVideo.current.pause()
+    //             localVideo.current.srcObject=null
+    //         }
+    //         if (remoteVideo.current) {
+    //             remoteVideo.current.pause()
+    //             remoteVideo.current.srcObject=null
+    //         }
+    //         mediaStream?.getTracks().forEach(track => track.stop())
+    //         mediaStream=null
+    //         peerConnection?.close()
+    //         setPeerConnection(null)
+    //         toggleVideoChat()
+    //     })
+
+    //     return () => {
+    //         socket.removeListener('answerMade')
+    //         socket.removeListener('receivedNewIceCandidate')
+    //         socket.removeListener('initiatedHangUp')
+    //         hangUp()
+    //         setIncomingCall(undefined)
+    //     }
+    // }, [incomingCall, channelID, userId, hangUp, toggleVideoChat, setIncomingCall, RTCSessionDescription, peerConnection])
+
+    // const handleCallStart = async() => {
+    //     if (incomingCall&&peerConnection) {
+    //         const handleIceCandidate = (event: RTCPeerConnectionIceEvent) => {
+    //             if (event.candidate) {
+    //                 socket.emit('newIceCandidate', event.candidate, channelID)
+    //             }
+    //         }
+    //         peerConnection.ontrack = (event:RTCTrackEvent) => {
+    //             console.log(event)
+    //             if (remoteVideo.current) {
+    //                 remoteVideo.current.srcObject = event.streams[0]
+    //             }
+    //         }
+            
+    //         const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true})
+    //         if (localVideo.current) {
+    //             localVideo.current.srcObject = stream;
+    //         }
+    //         mediaStream = stream
+    //         stream.getTracks().forEach(track => {
+    //             peerConnection?.addTrack(track, stream)
+    //         })
+    //         await peerConnection.setRemoteDescription(
+    //             new RTCSessionDescription(incomingCall.incomingOffer)
+    //         );
+    //         const answer = await peerConnection.createAnswer()
+    //         await peerConnection.setLocalDescription(new RTCSessionDescription(answer))
+    //         socket.emit("makeAnswer", answer, channelID)
+    //         peerConnection.onicecandidate = handleIceCandidate
+    //         socket.on('receivedNewIceCandidate', (candidate:RTCIceCandidate) => {
+    //             peerConnection?.addIceCandidate(candidate)
+    //         })
+    //         setCallActive(true)
+    //     }
+    // } 
+
+    // const handleCallEnd = () => {
+        
+    //     hangUp()
+    //     toggleVideoChat()
+    // }
+
+    const hangUp = useCallback((mediaStream:MediaStream|null) => {
+        if (mediaStream) {
+            if (localVideo.current) {
+                localVideo.current.pause()
+                localVideo.current.srcObject=null
+            }
+            if (remoteVideo.current) {
+                remoteVideo.current.pause()
+                remoteVideo.current.srcObject=null
+            }
+            mediaStream.getTracks().forEach(track => track.stop())
+            mediaStream=null
+            socket.emit('hangup', channelID)
+            peer?.disconnect()
         }
+    }, [channelID])
+    
 
+    useEffect(()=> {
         socket.on('initiatedHangUp', () => {
-            peerConnection?.close()
-            navigator.mediaDevices.getUserMedia({video: true, audio:true})
-            .then(stream => {
-                stream.getTracks().forEach(track => {
-                    track.stop();
+            hangUp(mediaStream)
+            toggleVideoChat(false)
+        })
+        
+        
+        if (!incomingCall) {
+
+            peer = new Peer(userId, {config:{iceServers:[{ 
+                urls: 'turn:numb.viagenie.ca',
+                credential: 'ait0ne666',
+                username: 'bonafide112358@gmail.com'}]
+            }})
+            socket.emit("callUser", userId, channelID)
+            socket.on('answerMade', (connectedUserId:string, channelID:string)=> {
+                peer?.connect(connectedUserId)
+                navigator.mediaDevices.getUserMedia({video:true, audio:true})
+                .then((stream:MediaStream) => {
+                    mediaStream = stream
+                    const call = peer?.call(connectedUserId, stream)
+                    if (localVideo.current) {
+                        localVideo.current.srcObject = mediaStream
+                    }
+                    call?.on("stream", (remoteStream) => {
+                        if (remoteVideo.current) {
+                            remoteVideo.current.srcObject = remoteStream
+                        }
+                        setCallActive(true)
+                    })
+                })
+                peer?.on("error", (err) => {
+                    hangUp(mediaStream)
                 })
             })
-            peerConnection = null
-            toggleVideoChat()
+
+
+        }
+        return () => {
+            socket.removeListener("answerMade")
+            socket.removeListener("initiatedHangUp")
+            hangUp(mediaStream)
+            setIncomingCall(undefined)
+        }
+    }, [userId, channelID, hangUp, incomingCall, toggleVideoChat, setIncomingCall])
+
+    const handleCallStart = () => {
+        peer = new Peer(userId, {config:{iceServers:[{ 
+            urls: 'turn:numb.viagenie.ca',
+            credential: 'ait0ne666',
+            username: 'bonafide112358@gmail.com'}]
+        }})
+        socket.emit("makeAnswer", userId, channelID)
+        peer.on("call", (call) => {
+            navigator.mediaDevices.getUserMedia({video:true, audio:true})
+            .then((stream) => {
+                mediaStream = stream
+                if (localVideo.current) {
+                    localVideo.current.srcObject = mediaStream
+                }
+                call.answer(mediaStream)
+                call?.on("stream", (remoteStream) => {
+                    if (remoteVideo.current) {
+                        remoteVideo.current.srcObject = remoteStream
+                    }
+                    setCallActive(true)
+                })
+            })
+        })
+        peer?.on("error", (err) => {
+            hangUp(mediaStream)
         })
 
-        return () => {
-            socket.removeListener('answerMade')
-            socket.removeListener('receivedNewIceCandidate')
-            socket.removeListener('initiatedHangUp')
-            hangUp()
-        }
-    }, [incomingCall, channelID, userId, hangUp, toggleVideoChat])
-
-    const handleCallStart = async() => {
-        if (incomingCall&&peerConnection) {
-            const handleIceCandidate = (event: RTCPeerConnectionIceEvent) => {
-                if (event.candidate) {
-                    socket.emit('newIceCandidate', event.candidate, channelID)
-                }
-            }
-            peerConnection.ontrack = (event:RTCTrackEvent) => {
-                if (remoteVideo.current) {
-                    remoteVideo.current.srcObject = event.streams[0]
-                }
-            }
-            
-            const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true})
-            if (localVideo.current) {
-                localVideo.current.srcObject = stream;
-            }
-            stream.getTracks().forEach(track => {
-                peerConnection?.addTrack(track, stream)
-            })
-            await peerConnection.setRemoteDescription(
-                new RTCSessionDescription(incomingCall.incomingOffer)
-            );
-            const answer = await peerConnection.createAnswer()
-            await peerConnection.setLocalDescription(new RTCSessionDescription(answer))
-            socket.emit("makeAnswer", answer, channelID)
-            peerConnection.onicecandidate = handleIceCandidate
-            socket.on('receivedNewIceCandidate', (candidate:RTCIceCandidate) => {
-                peerConnection?.addIceCandidate(candidate)
-            })
-            setCallActive(true)
-        }
-    } 
-
-    const handleCallEnd = () => {
-        hangUp()
-        toggleVideoChat()
     }
 
+    const handleCallEnd = () => {
+        hangUp(mediaStream)
+        toggleVideoChat(false)
+    }
 
     return (
         <VideoChatContainer>

@@ -43,7 +43,9 @@ const App: React.FC<ReduxProps> = ({setCurrentUser, currentUser}) => {
     return () => {
       socket.removeAllListeners()
     }
-}, [setCurrentUser])
+  }, [setCurrentUser])
+
+  
 
   return (
     <Fragment>
