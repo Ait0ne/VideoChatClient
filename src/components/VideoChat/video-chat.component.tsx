@@ -185,6 +185,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     // }
 
     const hangUp = useCallback((mediaStream:MediaStream|null) => {
+        console.log(mediaStream)
         if (mediaStream) {
             if (localVideo.current) {
                 localVideo.current.pause()
