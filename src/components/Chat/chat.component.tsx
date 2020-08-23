@@ -1,15 +1,16 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import background from '../../assets/chat-background.jpg'
 import moment from 'moment';
 
-import {socket} from '../../App';
+
 import {ChatContainer, CustomTextField, ChatInputContainer, ChatBodyContainer, CustomArrowUp, ChatMessageContainer} from './chat.styles';
 import {IUser} from '../../redux/user/user.types';
 
 
 interface ChatProps {
-    channelId:string,
-    currentUser: IUser,
+    messages: IMessage[],
+    sendMessage: (text:string) => void,
+    currentUser: IUser
 }
 
 
@@ -22,44 +23,10 @@ export interface IMessage {
 
 
 
-const Chat:React.FC<ChatProps> = ({channelId, currentUser}) => {
+const Chat:React.FC<ChatProps> = ({messages, sendMessage, currentUser}) => {
 
     const [messageText, setMessageText] = useState('')
-    const [messages, setMessages] = useState<IMessage[]>([])
-    const [newMessage, setNewMessage] = useState<{message:IMessage, channelID:string}|undefined>()
 
-    useEffect(() => {
-        const token = window.localStorage.getItem('token')
-        socket.emit('joinChannel', token, channelId, currentUser._id )
-    }, [channelId, currentUser])
-
-    useEffect(() => {
-        if (newMessage) {
-            const m = newMessage.message
-            setNewMessage(undefined)
-            setMessages([...messages, m])
-        }
-    }, [newMessage, messages])
-
-    useEffect(() => {
-        socket.on('messages', (messages:IMessage[]) => {
-            console.log(messages)
-            setMessages(messages)
-        })
-        socket.on('unauthorized', (err:any) => {
-            console.log(err)
-        })
-        socket.on('newMessage', ({message, channelID}: {message: IMessage, channelID:string}) => {
-            setNewMessage({message, channelID})
-            socket.emit('messageRead', {channelID, userID: currentUser._id})
-        })
-        return () => {
-            socket.removeListener('messages')
-            socket.removeListener('newMessage')
-            socket.removeListener('unauthorized')
-            socket.emit('leave', currentUser._id)
-        }
-    }, [currentUser])
 
     const handleChange =(event:React.ChangeEvent<HTMLTextAreaElement>) => {
         setMessageText(event.currentTarget.value)
@@ -67,13 +34,7 @@ const Chat:React.FC<ChatProps> = ({channelId, currentUser}) => {
 
     const handleClick = () => {
         if (messageText.length>0) {
-            const newMessage:IMessage = {
-                userId: currentUser._id,
-                text: messageText,
-                createdAt: new Date()
-            }    
-            socket.emit('addMessage', {message: newMessage, channelId })
-            setMessages([...messages, newMessage])
+            sendMessage(messageText)
             setMessageText('')
         }
     }
