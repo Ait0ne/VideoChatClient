@@ -43,6 +43,7 @@ const ChatListPage: React.FC<ReduxProps> = ({currentUser, setCurrentUser}) => {
         socket.emit('join', token)
 
         socket.on('newMessage', ({message, channelID}: {message: IMessage, channelID:string}) => {
+            console.log('newMessage')
             setNewMessage({message, channelID})
         })
     
@@ -79,6 +80,7 @@ const ChatListPage: React.FC<ReduxProps> = ({currentUser, setCurrentUser}) => {
 
     useEffect(() => {
         if (newMessage) {
+            console.log(newMessage)
             const newChannels = [...channels]
             const newMessageChannelIndex = newChannels.findIndex((channel) => {
                 console.log(channel._id === newMessage.channelID)

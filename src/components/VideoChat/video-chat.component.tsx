@@ -203,7 +203,11 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
             toggleVideoChat(false)
         })
         if (!incomingCall) {
-            peer = new Peer(userId)
+            peer = new Peer(userId, {config: { iceServers: [  {
+                    urls: 'turn:numb.viagenie.ca',
+                    credential: 'ait0ne666',
+                    username: 'bonafide112358@gmail.com'
+                }, { urls: 'stun:stun.l.google.com:19302' }]}})
             socket.emit("callUser", userId, channelID)
             socket.on('answerMade', (connectedUserId:string, id:string)=> {
                 peer?.connect(connectedUserId)
@@ -243,7 +247,11 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     }, [userId, channelID, hangUp, incomingCall, toggleVideoChat, setIncomingCall, setOutGoingCall])
 
     const handleCallStart = () => {
-        peer = new Peer(userId)
+        peer = new Peer(userId, {config: { iceServers: [  {
+            urls: 'turn:numb.viagenie.ca',
+            credential: 'ait0ne666',
+            username: 'bonafide112358@gmail.com'
+        }, { urls: 'stun:stun.l.google.com:19302' }]}})
         socket.emit("makeAnswer", userId, channelID)
         peer.on("call", (call) => {
             navigator.mediaDevices.getUserMedia({video:true, audio:true})
