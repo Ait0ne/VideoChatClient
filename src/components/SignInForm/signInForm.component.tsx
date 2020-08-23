@@ -42,7 +42,6 @@ const SignInForm: React.FC<ISignIn> = ({setCurrentUser, toggleShowSignIn, height
         setPassword('')
         axios.post(`${API_URL}login`, data)
         .then(response => {
-            console.log(response.data)
             if (response.data.error) {
                 alert('Incorrect email or password')
             } else {

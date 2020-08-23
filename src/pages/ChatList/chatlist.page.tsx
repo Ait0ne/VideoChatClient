@@ -43,13 +43,11 @@ const ChatListPage: React.FC<ReduxProps> = ({currentUser, setCurrentUser}) => {
         socket.emit('join', token)
 
         socket.on('newMessage', ({message, channelID}: {message: IMessage, channelID:string}) => {
-            console.log('newMessage')
             setNewMessage({message, channelID})
         })
     
     
         socket.on('channels', (channels:any[])=> {
-            console.log(channels)
             setChannels(channels)
         })
     
@@ -102,9 +100,6 @@ const ChatListPage: React.FC<ReduxProps> = ({currentUser, setCurrentUser}) => {
     return (
         <ChatListContainer>
             <Navigation />
-            {
-                console.log(channels)
-            }
             <AddChannelDialog />
             <ChannelList channels={channels.filter((channel) => channel.lastMessage)} userID={currentUser._id}/>
         </ChatListContainer>

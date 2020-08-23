@@ -180,7 +180,6 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     // }
 
     const hangUp = useCallback((mediaStream:MediaStream|null) => {
-        console.log(mediaStream)
         if (mediaStream) {
             if (localVideo.current) {
                 localVideo.current.pause()
@@ -205,7 +204,6 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
         })
         if (!incomingCall) {
             peer = new Peer(userId)
-            console.log(userId, channelID)
             socket.emit("callUser", userId, channelID)
             socket.on('answerMade', (connectedUserId:string, id:string)=> {
                 peer?.connect(connectedUserId)
@@ -282,7 +280,6 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
 
     return (
         <VideoChatContainer>
-            {console.log(channelID, userId, incomingCall)}
             {
                 !callActive?
                 <Fragment>

@@ -26,8 +26,9 @@ const ChannelList:React.FC<ChannelListProps> = ({channels, userID}) => {
     }
     
     const ChannelItem = ({channel}: {channel: IChannel}) => {
+        const isThereANewMessage = channel.newMessages instanceof Map ? channel.newMessages.get(userID): channel.newMessages[userID]
         return (
-            <ListItem onClick={() => handleJoinChannel(channel._id)} className={channel.newMessages[userID]? 'new-message-list-item' : ''}>
+            <ListItem onClick={() => handleJoinChannel(channel._id)} className={isThereANewMessage? 'new-message-list-item' : ''}>
                 <ListItemAvatar>
                     <Avatar>
                         <CustomAccountCircle/>
@@ -38,7 +39,7 @@ const ChannelList:React.FC<ChannelListProps> = ({channels, userID}) => {
                 secondary={channel.lastMessage.text}
                 />
                 {
-                    channel.newMessages[userID]?
+                    isThereANewMessage?
                     <CustomBadge color='primary' variant='dot'/>
                     :null
                 }
