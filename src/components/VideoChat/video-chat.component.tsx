@@ -24,7 +24,7 @@ interface VideoChatProps {
     } | undefined>>
 } 
 
-let peer: Peer|null = null;
+// let peer: Peer|null = null;
 let mediaStream:MediaStream|null=null;
 
 const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID, incomingCall, connectedUserName, setIncomingCall, setOutGoingCall}) => {
@@ -33,7 +33,7 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     const [callActive, setCallActive] = useState(false)
 
     const {RTCPeerConnection, RTCSessionDescription} = window
-    const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [{urls: 'stun.l.google.com:19302'},
+    const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [{urls: 'stun:stun.l.google.com:19302'},
     {
         urls: 'turn:numb.viagenie.ca',
         credential: 'muazkh',
