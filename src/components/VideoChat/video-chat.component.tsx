@@ -33,7 +33,12 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     const [callActive, setCallActive] = useState(false)
 
     const {RTCPeerConnection, RTCSessionDescription} = window
-    const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [
+    const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [{urls: 'stun.l.google.com:19302'},
+    {
+        urls: 'turn:numb.viagenie.ca',
+        credential: 'muazkh',
+        username: 'webrtc@live.com'
+    },
         {
         urls: 'turn:numb.viagenie.ca',
         credential: 'ait0ne666',
