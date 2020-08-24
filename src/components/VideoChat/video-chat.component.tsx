@@ -3,7 +3,7 @@ import React, {useRef, useEffect, useState, Fragment, useCallback} from 'react';
 import {VideoChatContainer, CallHeaderContainer, ConnectedUserAvatar, CustomAccountCircle, VideoChatActionButtons} from './video-chat.styles';
 import {socket} from '../../App';
 import {Call, CallEnd} from '@material-ui/icons';
-import Peer from 'peerjs'
+// import Peer from 'peerjs'
 
 interface VideoChatProps {
     toggleVideoChat: React.Dispatch<React.SetStateAction<boolean>>,
@@ -33,17 +33,22 @@ const VideoChat: React.FC<VideoChatProps> = ({toggleVideoChat, userId, channelID
     const [callActive, setCallActive] = useState(false)
 
     const {RTCPeerConnection, RTCSessionDescription} = window
-    const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({iceServers: [{urls: 'stun:stun.l.google.com:19302'},
-    {
-        urls: 'turn:numb.viagenie.ca',
-        credential: 'muazkh',
-        username: 'webrtc@live.com'
-    },
-        {
-        urls: 'turn:numb.viagenie.ca',
-        credential: 'ait0ne666',
-        username: 'bonafide112358@gmail.com'
-    },]}))
+    const [peerConnection, setPeerConnection] = useState<RTCPeerConnection|null>(new RTCPeerConnection({
+        iceServers: [{
+            urls: [ "stun:eu-turn7.xirsys.com" ]
+         }, {
+            username: "K76aV-XHByAZRIzIw-BCctAHZBTnY3KskekBop_cnu8MPnS5R8PgF-b9hSOfgr0JAAAAAF9DdENhaXQwbmU=",
+            credential: "436e4628-e5e0-11ea-9829-0242ac140004",
+            urls: [
+                "turn:eu-turn7.xirsys.com:80?transport=udp",
+                "turn:eu-turn7.xirsys.com:3478?transport=udp",
+                "turn:eu-turn7.xirsys.com:80?transport=tcp",
+                "turn:eu-turn7.xirsys.com:3478?transport=tcp",
+                "turns:eu-turn7.xirsys.com:443?transport=tcp",
+                "turns:eu-turn7.xirsys.com:5349?transport=tcp"
+            ]
+         }]
+    }))
     
     
     const hangUp = useCallback((mediaStream:MediaStream|null) => {
